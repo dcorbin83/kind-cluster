@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    kind.service: client
+  name: client
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      kind.service: client
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        kind.service: client
+        role: client
+    spec:
+      containers:
+      - image: ghcr.io/kubecorn/test-crow/client:latest-k8s
+        imagePullPolicy: "Always"
+        name: client
+        resources: {}
+        volumeMounts:
+        - mountPath: /data/history/
+          name: cache-volume
+      initContainers:
+      - name: init-file
+        image: centos:7
+        command: ["/bin/bash", "-c"]
+        args: ["echo 'Init File' >> /data/history/client_history.txt"]
+        volumeMounts:
+        - mountPath: /data/history/
+          name: cache-volume
+      imagePullSecrets:
+      - name: kubecorn-registry
+      restartPolicy: Always
+      volumes:
+      - name: cache-volume
+        emptyDir: {}
+status: {}
+

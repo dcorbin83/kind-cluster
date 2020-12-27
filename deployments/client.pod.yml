@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: client
+spec:
+  containers:
+  - image: ghcr.io/kubecorn/test-crow/client:latest
+    name: client
+    resources: {}
+  restartPolicy: OnFailure
+  imagePullSecrets:
+  - name: kubecorn-registry

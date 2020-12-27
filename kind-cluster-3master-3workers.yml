@@ -1,0 +1,38 @@
+# a cluster with 3 control-plane nodes and 3 workers
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+networking:
+  # WARNING: It is _strongly_ recommended that you keep this the default
+  # (127.0.0.1) for security reasons. However it is possible to change this.
+  #apiServerAddress: "0.0.0.0"
+  # By default the API server listens on a random open port.
+  # You may choose a specific port but probably don't need to in most cases.
+  # Using a random port makes it easier to spin up multiple clusters.
+  apiServerPort: 6443
+  disableDefaultCNI: true # disable kindnet
+  podSubnet: 192.168.0.0/16 # set to Calico's default subnet
+# kubeadmConfigPatches: # !!WARNING!! IN ORDER TO MAKE LENS WORKING REPLACE 10.1.28.56 BY YOUR VIRTUAL BOX MACHINE IP
+#   - |
+#     kind: ClusterConfiguration
+#     apiServer:
+#       certSANs: [localhost, "127.0.0.1", "10.1.28.56", "0.0.0.0"]
+nodes:
+- role: control-plane
+  kubeadmConfigPatches:
+  - |
+    kind: InitConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        node-labels: "ingress-ready=true"
+  extraPortMappings:
+  - containerPort: 80
+    hostPort: 80
+    protocol: TCP
+  - containerPort: 443
+    hostPort: 443
+    protocol: TCP
+#- role: control-plane
+#- role: control-plane
+- role: worker
+- role: worker
+- role: worker

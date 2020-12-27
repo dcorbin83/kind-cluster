@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    kind.service: server
+  name: server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      kind.service: server
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        kind.service: server
+        role: server
+    spec:
+      containers:
+      - image: ghcr.io/kubecorn/test-crow/server:latest
+        imagePullPolicy: "Always"
+        name: server
+        envFrom:
+        - configMapRef:
+            name: server-config
+        livenessProbe:
+          exec:
+            command:
+            - /bin/bash
+            - -c 
+            - "[[ ! -z $(pgrep -x 'crow_server_bin') ]] && echo 'server_crow_bin PID found' || exit 1"
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        readinessProbe:
+          tcpSocket:
+            port: 9080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        ports:
+        - containerPort: 9080
+        resources: {}
+        # volumeMounts:
+        # - mountPath: /data/history
+        #   name: shared
+      imagePullSecrets:
+      - name: kubecorn-registry
+      restartPolicy: Always
+      # serviceAccountName: ""
+      # volumes:
+      # - name: shared
+      #   persistentVolumeClaim:
+      #     claimName: shared
+status: {}

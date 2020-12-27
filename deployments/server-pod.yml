@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: server
+  labels:
+    name: server
+    kind.service: server
+spec:
+  containers:
+  - image: ghcr.io/kubecorn/test-crow/server:latest
+    name: server
+    resources: {}
+    ports:
+      - containerPort: 9080
+  restartPolicy: OnFailure
+  imagePullSecrets:
+  - name: kubecorn-registry

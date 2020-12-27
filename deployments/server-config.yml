@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: server-config
+  namespace: default
+data:
+  SERVER_MESSAGE: "HELLO WORLD!"
